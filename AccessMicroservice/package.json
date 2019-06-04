@@ -1,0 +1,28 @@
+{
+  "name": "SecureAccess",
+  "version": "1.0.0",
+  "description": "An Access control RESTFUL API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "Access control"
+  ],
+  "author": "Islam Benkhelifa",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.2",
+    "morgan": "^1.9.1",
+    "multer": "^1.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
+  }
+}
