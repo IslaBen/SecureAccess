@@ -1,0 +1,23 @@
+h1{
+    font: 500 30px/54px Roboto,"Helvetica Neue",sans-serif;
+    margin-top: 0%;
+}
+
+table {
+    width: 100%;
+    background: transparent;
+  }
+  
+  .mat-form-field {
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  .container{
+    height: 85%;
+
+    overflow: auto;
+  }
+  th{
+      background: #1d1e22;
+  }

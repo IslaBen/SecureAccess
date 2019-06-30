@@ -1,0 +1,11 @@
+.example-form{
+    margin: 16px;
+}
+
+.mat-form-field {
+    margin: 16px;
+}
+.container{
+    height: 200px;
+    overflow: auto;
+}

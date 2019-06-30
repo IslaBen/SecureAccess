@@ -1,0 +1,18 @@
+<!--The content below is only a placeholder and can be replaced.-->
+
+<app-navbar></app-navbar>
+<div >
+    <mat-drawer-container  class="example-container">
+        <mat-drawer id="container" mode="side" opened>
+            <mat-list>
+                <a mat-list-item routerLink="/Statistics"> Statistics </a>
+                <a mat-list-item routerLink="/AccessLog"> AccessLog </a>
+                <a mat-list-item routerLink="/UserManagement"> Users Management </a>
+                <a mat-list-item routerLink="/RoomManagement"> Room Management </a>
+               </mat-list>
+        </mat-drawer>
+        <mat-drawer-content>
+            <router-outlet></router-outlet>
+        </mat-drawer-content>
+    </mat-drawer-container>    
+</div>  
