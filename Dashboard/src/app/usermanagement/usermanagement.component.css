@@ -1,11 +1,20 @@
+
+.container{
+    height: 200px;
+    overflow: auto;
+}
+
+ 
 .example-form{
     margin: 16px;
 }
 
 .mat-form-field {
     margin: 16px;
+    font-size: 14px;
 }
-.container{
-    height: 200px;
-    overflow: auto;
-}
+table {
+    width: 100%;
+    background: transparent;
+  }
+

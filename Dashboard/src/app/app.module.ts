@@ -19,7 +19,11 @@ import { UsermanagementComponent } from './usermanagement/usermanagement.compone
 import { RoomManagementComponent } from './room-management/room-management.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import {MatTableModule} from '@angular/material/table';
-import {MatTabsModule} from '@angular/material/tabs'; 
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'; 
+import {MatPaginatorModule} from '@angular/material/paginator'; 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,7 +34,7 @@ import {MatTabsModule} from '@angular/material/tabs';
     AccesslogComponent,
     UsermanagementComponent,
     RoomManagementComponent,
-    StatisticsComponent
+    StatisticsComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,10 @@ import {MatTabsModule} from '@angular/material/tabs';
     MatSidenavModule,
     MatListModule,
     MatTableModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSlideToggleModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

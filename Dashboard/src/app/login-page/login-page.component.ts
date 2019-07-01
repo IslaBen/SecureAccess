@@ -10,7 +10,10 @@ export class LoginPageComponent implements OnInit {
 
   constructor(private loadingPageService: LoadingPageService) {
     this.loadingPageService.startLoading();
-    this.loadingPageService.stopLoading();
+    setTimeout(function() {
+      this.loadingPageService.stopLoading();      //your code to be executed after 1 second
+    }, 5000);
+
    }
 
   ngOnInit() {

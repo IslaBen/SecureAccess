@@ -1,4 +1,14 @@
-h1{
-    font: 500 30px/54px Roboto,"Helvetica Neue",sans-serif;
-    margin-top: 0%;
+ 
+.example-form{
+    margin: 16px;
 }
+
+.mat-form-field {
+    margin: 16px;
+    font-size: 14px;
+}
+table {
+    width: 100%;
+    background: transparent;
+  }
+

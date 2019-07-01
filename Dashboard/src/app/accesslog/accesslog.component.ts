@@ -3,22 +3,21 @@ import { MatTableDataSource } from '@angular/material/table';
 
 export interface PeriodicElement {
   name: string;
-  position: number;
-  weight: number;
-  symbol: string;
+  room: string;
+  time: string;
 }
 
 const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
+  { name: 'Youcef', room: "lab1", time: '12/08/2019'},
+  { name: 'Taamma', room: "lab4", time: '12/08/2019'},
+  { name: 'Baba', room: "lab6", time: '12/08/2019'},
+  { name: 'Dadi', room: "lab9", time: '12/08/2019'},
+  { name: 'Hamidi', room: "lab10", time: '12/08/2019'},
+  { name: 'Benkhelifa', room: "lab12", time: '12/08/2019'},
+  { name: 'Mecheref', room: "lab14", time: '12/08/2019'},
+  { name: 'Oussama', room: "lab15", time: '12/08/2019'},
+  { name: 'Rabie', room: "lab18", time: '12/08/2019'},
+  { name: 'Islam', room: "lab20", time: '12/08/2019'},
 ];
 
 @Component({
@@ -33,7 +32,7 @@ export class AccesslogComponent implements OnInit {
   ngOnInit() {
   }
 
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
+  displayedColumns: string[] = ['name', 'room', 'time'];
   dataSource = new MatTableDataSource(ELEMENT_DATA);
 
   applyFilter(filterValue: string) {
