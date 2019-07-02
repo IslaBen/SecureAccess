@@ -9,7 +9,7 @@ var db = mongoose.connect("mongodb://localhost:27017/AccessControl",{ useNewUrlP
 
 const person = require("./models/Person");
 const log = require("./models/AccessLog");
-
+const room = require("./models/Room")
 //==================================================================================================
 
 app.use(morgan('dev'));
@@ -108,26 +108,37 @@ app.get('/persons/:personId',(req,res, next) => {
     person.find({rfID : id})
         .exec()
         .then(doc=>{
-            console.log(doc);
             if (doc.length>0){
-                console.log(doc);
-                const accessLog = new log({
-                    _id : mongoose.Types.ObjectId(),
-                    person: doc[0]._id,
-                    door : req.body.door,
+                room.find({position : req.body.position})
+                    .exec()
+                    .then(reqRoom =>{
+                        if(reqRoom.length>0 && doc[0].rooms.includes(reqRoom._id)){
+                            const accessLog = new log({
+                                _id : mongoose.Types.ObjectId(),
+                                person: doc[0]._id,
+                                room : reqRoom[0]._id,
+                            });
+                            accessLog.save()
+                                     .catch(err=>{
+                                           console.log(err);
+                                           res.status(500).json({
+                                           error:err
+                                           });
+                                        });
+                            const response = {
+                                message : "access permisson granted "
+                            }
+                            res.status(200).json(response);
+                        } else {
+                            res.status(401).json({
+                                message:"Access denied !!!"
+                            });   
+                        }
                 })
-
-                accessLog.save()
-                    .catch(err=>{
+                .catch(err=>{
                     console.log(err);
-                    res.status(500).json({
-                        error:err
-                    });
-                });;
-                const response = {
-                    message : "access permisson granted "
-                }
-                res.status(200).json(response);
+                    res.status(500).json({error:err});
+                })
             }else {
                 res.status(401).json({
                     message:"Access denied !!!"
@@ -140,7 +151,7 @@ app.get('/persons/:personId',(req,res, next) => {
         })
 });
 
-//================ Update ====================================================
+//================ UpdatePerson ====================================================
 
 app.patch('/persons/:personId',(req,res, next) => {
     const id = req.params.personId;
@@ -152,7 +163,7 @@ app.patch('/persons/:personId',(req,res, next) => {
         .exec()
         .then(result=>{
             res.status(200).json({
-                message:"entry updated !!",
+                message:"User updated !!",
             });
         })
         .catch(err=>{
@@ -163,7 +174,7 @@ app.patch('/persons/:personId',(req,res, next) => {
         });
 });
 
-//================ Delete ================================================
+//================ DeletePerson ================================================
 
 app.delete('/persons/:personId',(req,res, next) => {
     const id = req.params.personId;
@@ -186,6 +197,269 @@ app.delete('/persons/:personId',(req,res, next) => {
 
 
 //==================================================================================================
+//==================================================================================================
+//==================================================================================================
+
+//================ Get all rooms ==================================================================================
+
+
+app.get('/rooms',(req,res)=>{
+    room.find()
+        .exec()
+        .then(docs=>{
+            res.status(200).json(docs);
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+
+})
+
+//================ Add room ====================================================================
+
+app.post('/rooms',(req,res, next) => {
+    
+    const newRoom = new room({
+        _id : mongoose.Types.ObjectId(),
+        name: req.body.name,
+        position : req.body.position,
+        state : false
+    })
+
+    newRoom.save()
+        .then(result=>{
+            console.log(result);
+            res.status(200).json({
+                entry:'person',
+                createdEntry: {
+                    id : newRoom._id,
+                    name: newRoom.name,
+                    lastName: newRoom.position,
+                    rfID: newRoom.state,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/rooms/' + newRoom._id
+                    }
+                }
+            });
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            })
+        });
+
+});
+
+//================ get room ========================================================
+
+app.get('/rooms/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    room.find({_id : id})
+        .exec()
+        .then(doc=>{
+            if (doc.length>0){
+                res.status(200).json(doc);
+            }else {
+                res.status(404).json({
+                    message:" Room doesn't exist :( "
+                });
+            }
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({error:err});
+        })
+});
+
+//================ UpdateRoom ====================================================
+
+app.patch('/persons/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    const updateOpts = {};
+    for (const ops of Object.keys(req.body)){
+        updateOpts[ops] = req.body[ops];
+    }
+    room.update({_id:id},{ $set:updateOpts})
+        .exec()
+        .then(result=>{
+            res.status(200).json({
+                message:"room status updated",
+            });
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+});
+
+//================ DeleteRoom ================================================
+
+app.delete('/persons/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    person.remove({_id: id})
+          .exec()
+          .then(result=>{
+              res.status(200).json({
+                  message:"Room deleted !!",
+              });
+          })
+          .catch(err=>{
+              console.log(err);
+              res.status(500).json({
+                  error:err
+              });
+          });
+});
+
+
+//==================================================================================================
+//==================================================================================================
+//==================================================================================================
+
+//================ Get all Log ==================================================================================
+
+
+app.get('/log',(req,res)=>{
+    log.find()
+        .exec()
+        .then(docs=>{
+            const response = {
+                count: docs.length,
+                persons: docs.map(doc => {
+                    return {
+                        _id : doc._id,
+                        name : doc.name,
+                        position : doc.position,
+                        state : doc.state,
+                        request : {
+                            type : 'GET',
+                            url : 'http://localhost:3000/log/' + doc._id
+                        }
+                    }
+                })
+            }
+            res.status(200).json(response);
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+
+})
+
+//================ Add room ====================================================================
+
+app.post('/rooms',(req,res, next) => {
+    
+    const newRoom = new room({
+        _id : mongoose.Types.ObjectId(),
+        name: req.body.name,
+        position : req.body.position,
+        state : false
+    })
+
+    newRoom.save()
+        .then(result=>{
+            console.log(result);
+            res.status(200).json({
+                entry:'person',
+                createdEntry: {
+                    id : newRoom._id,
+                    name: newRoom.name,
+                    lastName: newRoom.position,
+                    rfID: newRoom.state,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/rooms/' + newRoom._id
+                    }
+                }
+            });
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            })
+        });
+
+});
+
+//================ get room ========================================================
+
+app.get('/rooms/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    room.find({_id : id})
+        .exec()
+        .then(doc=>{
+            if (doc.length>0){
+                res.status(200).json(doc);
+            }else {
+                res.status(404).json({
+                    message:" Room doesn't exist :( "
+                });
+            }
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({error:err});
+        })
+});
+
+//================ UpdateRoom ====================================================
+
+app.patch('/persons/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    const updateOpts = {};
+    for (const ops of Object.keys(req.body)){
+        updateOpts[ops] = req.body[ops];
+    }
+    room.update({_id:id},{ $set:updateOpts})
+        .exec()
+        .then(result=>{
+            res.status(200).json({
+                message:"room status updated",
+            });
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+});
+
+//================ DeleteRoom ================================================
+
+app.delete('/persons/:RoomId',(req,res, next) => {
+    const id = req.params.RoomId;
+    person.remove({_id: id})
+          .exec()
+          .then(result=>{
+              res.status(200).json({
+                  message:"Room deleted !!",
+              });
+          })
+          .catch(err=>{
+              console.log(err);
+              res.status(500).json({
+                  error:err
+              });
+          });
+});
+
+
+//==================================================================================================
+
+
 
 // 404 routes
 app.use((req,res,next)=>{

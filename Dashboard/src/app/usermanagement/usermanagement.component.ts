@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { User } from '../User';
 
 
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  rfID: number;
-}
-const ELEMENT_DATA: PeriodicElement[] = [
+
+const ELEMENT_DATA: User[] = [
   {position: 1, name: 'Hydrogen', rfID: 123456},
   {position: 2, name: 'Helium', rfID: 4.0026},
   {position: 3, name: 'Lithium', rfID: 6.941},

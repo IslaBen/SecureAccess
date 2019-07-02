@@ -23,7 +23,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'; 
 import {MatPaginatorModule} from '@angular/material/paginator'; 
-
+/* import { ChartsModule } from 'ng2-charts';
+ */
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,7 +52,8 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     MatTabsModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    /* ChartsModule */
   ],
   providers: [],
   bootstrap: [AppComponent]

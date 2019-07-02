@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { AccessLog } from '../AccessLog';
 
-export interface PeriodicElement {
-  name: string;
-  room: string;
-  time: string;
-}
 
-const ELEMENT_DATA: PeriodicElement[] = [
+
+const ELEMENT_DATA: AccessLog[] = [
   { name: 'Youcef', room: "lab1", time: '12/08/2019'},
   { name: 'Taamma', room: "lab4", time: '12/08/2019'},
   { name: 'Baba', room: "lab6", time: '12/08/2019'},

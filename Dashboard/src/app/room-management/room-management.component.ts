@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { Room } from '../Room';
 
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  state : boolean;
-}
-const ELEMENT_DATA: PeriodicElement[] = [
+
+const ELEMENT_DATA: Room[] = [
   {position: 1, name: 'Hydrogen',state :true},
   {position: 2, name: 'Helium',state :false},
   {position: 3, name: 'Lithium', state :false},
