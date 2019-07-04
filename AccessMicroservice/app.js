@@ -1,15 +1,25 @@
 const express = require('express');
 const app = express();
+var jwt = require('jsonwebtoken');
 const morgan = require('morgan');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 var db = mongoose.connect("mongodb://localhost:27017/AccessControl",{ useNewUrlParser: true });
 
-//===========================================================================================
 
+// // fix problem angular
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//     next();
+// });
+//===========================================================================================
+const _KEY = 'mySecretKey'
 const person = require("./models/Person");
 const log = require("./models/AccessLog");
 const room = require("./models/Room")
+const User = require("./models/User")
 //==================================================================================================
 
 app.use(morgan('dev'));
@@ -31,29 +41,87 @@ app.use(( req, res, next)=>{
     next();
 });
 
-//================ Get all ==================================================================================
+//================ midelware ==================================================================================
 
+function verifyToken (req, res, next) {
+    if (!req.headers.authorization) {
+        return res.status(401).send('Unautorized request')
+    }
+    let token = req.headers.authorization.split(' ')[1];
+    if (token === 'null') {
+        return res.status(401).send('Unautorized request')
+    }
+    let payload = jwt.verify(token, _KEY);
+    if (!payload) {
+        return res.status(401).send('Unautorized request')
+    }
+    req.userId = payload.subject;
+    next()
+}
+
+//================ auth    ==================================================================================
+
+// app.post('/Signin', (req, res) =>{
+//     console.log('hh554445hhh');
+//     let user = new User(req.body);
+//     console.log('hh554566hhh');
+//     user.save((err, user) => {
+//         if (err) {
+//
+//             consol.log(err.error)
+//         } else {
+//             console.log('hh55466876875hhh');
+//             let payload = { subject: user._id };
+//             let token = jwt.sign(payload, _KEY);
+//             res.status(200).send({token})
+//         }
+//     })
+// });
+app.post('/Register', (req, res) =>{
+    let user = new User(req.body);
+    user.save((err, user) => {
+        if (err) {
+            consol.log(err)
+        } else {
+            let payload = { subject: user._id };
+            let token = jwt.sign(payload, _KEY);
+            res.status(200).send({token})
+        }
+    })
+});
+
+app.post('/Login', (req, res) =>{
+    User.findOne({email : req.body.email}, (err, user) => {
+        if (err) {
+            console.log(err);
+        } else {
+            if (!user) {
+                res.status(401).send('Invalid email or password');
+            } else {
+                if (user.password !== req.body.password) {
+                    res.status(401).send('Invalid email or password')
+                } else {
+                    let payload = { subject: user._id };
+                    let token = jwt.sign(payload, _KEY);
+                    res.status(200).send({token})
+                }
+            }
+        }
+    })
+});
+
+app.get("/Users", (req, res) => {
+    User.find().then(function(user){
+        res.json(user);
+    })
+})
+//================ Get all ==================================================================================
 
 app.get('/persons',(req,res)=>{
     person.find()
         .exec()
         .then(docs=>{
-            const response = {
-                count: docs.length,
-                persons: docs.map(doc => {
-                    return {
-                        _id: doc._id,
-                        name: doc.name,
-                        lastName: doc.lastName,
-                        rfID : doc.rfID,
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:3000/persons/' + doc.rfID
-                        }
-                    }
-                })
-            }
-            res.status(500).json(response);
+            res.status(200).json(docs);
         })
         .catch(err=>{
             console.log(err);
@@ -64,37 +132,46 @@ app.get('/persons',(req,res)=>{
 
 })
 
+//================ get Person ====================================================================
+
+app.get('/persons/:PersonId',(req,res, next) => {
+    const id = req.params.PersonId;
+    person.find({_id : id})
+        .exec()
+        .then(doc=>{
+            if (doc.length>0){
+                res.status(200).json(doc[0]);
+            }else {
+                res.status(404).json({
+                    message:" person doesn't exist :( "
+                });
+            }
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({error:err});
+        })
+});
 //================ Add Person ====================================================================
 
-app.post('/persons',(req,res, next) => {
+app.post('/persons',verifyToken, (req,res, next) => {
     
     const p = new person({
         _id : mongoose.Types.ObjectId(),
         name: req.body.name,
         lastName : req.body.lastName,
-        rfID : req.body.rfID
-    })
+        rfID : req.body.rfID,
+        rooms : req.body.rooms
+    });
 
     p.save()
         .then(result=>{
             console.log(result);
-            res.status(200).json({
-                entry:'person',
-                createdEntry: {
-                    id : p._id,
-                    name: p.name,
-                    lastName: p.lastName,
-                    rfID: p.rfID,
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:3000/persons/' + p.rfID
-                    }
-                }
-            });
+            res.status(200).json(result);
         })
         .catch(err=>{
             console.log(err);
-            res.status(500).json({
+            res.status(401).json({
                 error:err
             })
         });
@@ -103,24 +180,23 @@ app.post('/persons',(req,res, next) => {
 
 //================ AccessRequest ========================================================
 
-app.get('/persons/:personId',(req,res, next) => {
+app.get('/persons/:personId/:position', (req,res, next) => {
     const id = req.params.personId;
     person.find({rfID : id})
         .exec()
         .then(doc=>{
             if (doc.length>0){
-                room.find({position : req.body.position})
+                room.find({position : req.params.position})
                     .exec()
                     .then(reqRoom =>{
-                        if(reqRoom.length>0 && doc[0].rooms.includes(reqRoom._id)){
+                        if(reqRoom.length>0 && doc[0].rooms.includes(reqRoom[0]._id) && reqRoom[0].state){
                             const accessLog = new log({
                                 _id : mongoose.Types.ObjectId(),
                                 person: doc[0]._id,
-                                room : reqRoom[0]._id,
+                                door : reqRoom[0]._id,
                             });
                             accessLog.save()
                                      .catch(err=>{
-                                           console.log(err);
                                            res.status(500).json({
                                            error:err
                                            });
@@ -131,8 +207,8 @@ app.get('/persons/:personId',(req,res, next) => {
                             res.status(200).json(response);
                         } else {
                             res.status(401).json({
-                                message:"Access denied !!!"
-                            });   
+                                message:"Access denied 2 !!!"
+                            });
                         }
                 })
                 .catch(err=>{
@@ -141,7 +217,7 @@ app.get('/persons/:personId',(req,res, next) => {
                 })
             }else {
                 res.status(401).json({
-                    message:"Access denied !!!"
+                    message:"Access denied 1!!!"
                 });
             }
         })
@@ -232,19 +308,7 @@ app.post('/rooms',(req,res, next) => {
     newRoom.save()
         .then(result=>{
             console.log(result);
-            res.status(200).json({
-                entry:'person',
-                createdEntry: {
-                    id : newRoom._id,
-                    name: newRoom.name,
-                    lastName: newRoom.position,
-                    rfID: newRoom.state,
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:3000/rooms/' + newRoom._id
-                    }
-                }
-            });
+            res.status(200).json(result);
         })
         .catch(err=>{
             console.log(err);
@@ -263,7 +327,7 @@ app.get('/rooms/:RoomId',(req,res, next) => {
         .exec()
         .then(doc=>{
             if (doc.length>0){
-                res.status(200).json(doc);
+                res.status(200).json(doc[0]);
             }else {
                 res.status(404).json({
                     message:" Room doesn't exist :( "
@@ -278,7 +342,7 @@ app.get('/rooms/:RoomId',(req,res, next) => {
 
 //================ UpdateRoom ====================================================
 
-app.patch('/persons/:RoomId',(req,res, next) => {
+app.patch('/rooms/:RoomId',(req,res, next) => {
     const id = req.params.RoomId;
     const updateOpts = {};
     for (const ops of Object.keys(req.body)){
@@ -301,9 +365,9 @@ app.patch('/persons/:RoomId',(req,res, next) => {
 
 //================ DeleteRoom ================================================
 
-app.delete('/persons/:RoomId',(req,res, next) => {
+app.delete('/rooms/:RoomId',(req,res, next) => {
     const id = req.params.RoomId;
-    person.remove({_id: id})
+    room.remove({_id: id})
           .exec()
           .then(result=>{
               res.status(200).json({
@@ -325,27 +389,11 @@ app.delete('/persons/:RoomId',(req,res, next) => {
 
 //================ Get all Log ==================================================================================
 
-
-app.get('/log',(req,res)=>{
+app.get('/logs',(req,res)=>{
     log.find()
         .exec()
         .then(docs=>{
-            const response = {
-                count: docs.length,
-                persons: docs.map(doc => {
-                    return {
-                        _id : doc._id,
-                        name : doc.name,
-                        position : doc.position,
-                        state : doc.state,
-                        request : {
-                            type : 'GET',
-                            url : 'http://localhost:3000/log/' + doc._id
-                        }
-                    }
-                })
-            }
-            res.status(200).json(response);
+            res.status(200).json(docs);
         })
         .catch(err=>{
             console.log(err);
@@ -356,48 +404,34 @@ app.get('/log',(req,res)=>{
 
 })
 
-//================ Add room ====================================================================
+//================ Add Log ====================================================================
 
-app.post('/rooms',(req,res, next) => {
+app.post('/logs',(req,res, next) => {
     
-    const newRoom = new room({
+    const newLog = new log({
         _id : mongoose.Types.ObjectId(),
-        name: req.body.name,
-        position : req.body.position,
-        state : false
-    })
-
-    newRoom.save()
-        .then(result=>{
+        person : req.body.person,
+        door : req.body.door
+    });
+    newLog.save().then(
+        result=>{
             console.log(result);
-            res.status(200).json({
-                entry:'person',
-                createdEntry: {
-                    id : newRoom._id,
-                    name: newRoom.name,
-                    lastName: newRoom.position,
-                    rfID: newRoom.state,
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:3000/rooms/' + newRoom._id
-                    }
-                }
-            });
-        })
-        .catch(err=>{
+            res.status(200).json(result);
+        }).catch(
+            err=>{
             console.log(err);
-            res.status(500).json({
+            res.status(401).json({
                 error:err
             })
         });
 
 });
 
-//================ get room ========================================================
+//================ get Log ======================================================== TODO
 
-app.get('/rooms/:RoomId',(req,res, next) => {
+app.get('/logs/:LogId',(req,res, next) => {
     const id = req.params.RoomId;
-    room.find({_id : id})
+    log.find({_id : id})
         .exec()
         .then(doc=>{
             if (doc.length>0){
@@ -414,15 +448,15 @@ app.get('/rooms/:RoomId',(req,res, next) => {
         })
 });
 
-//================ UpdateRoom ====================================================
+//================ UpdateLog ====================================================
 
-app.patch('/persons/:RoomId',(req,res, next) => {
-    const id = req.params.RoomId;
+app.patch('/logs/:LogId',(req,res, next) => {
+    const id = req.params.LogId;
     const updateOpts = {};
     for (const ops of Object.keys(req.body)){
         updateOpts[ops] = req.body[ops];
     }
-    room.update({_id:id},{ $set:updateOpts})
+    log.update({_id:id},{ $set:updateOpts})
         .exec()
         .then(result=>{
             res.status(200).json({
@@ -437,11 +471,11 @@ app.patch('/persons/:RoomId',(req,res, next) => {
         });
 });
 
-//================ DeleteRoom ================================================
+//================ DeleteLog ================================================
 
-app.delete('/persons/:RoomId',(req,res, next) => {
-    const id = req.params.RoomId;
-    person.remove({_id: id})
+app.delete('/logs/:LogId',(req,res, next) => {
+    const id = req.params.LogId;
+    log.remove({_id: id})
           .exec()
           .then(result=>{
               res.status(200).json({

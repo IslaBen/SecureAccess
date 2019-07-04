@@ -2,7 +2,7 @@
 
 <app-navbar></app-navbar>
 <div >
-    <mat-drawer-container  class="example-container">
+    <mat-drawer-container  class="example-container" *ngIf="auth.logedIn()">
         <mat-drawer id="container" mode="side" opened>
             <mat-list>
                 <a mat-list-item routerLink="/Statistics"> Statistics </a>
@@ -14,5 +14,6 @@
         <mat-drawer-content>
             <router-outlet></router-outlet>
         </mat-drawer-content>
-    </mat-drawer-container>    
+    </mat-drawer-container>
+    <router-outlet *ngIf="!auth.logedIn()"></router-outlet>
 </div>  

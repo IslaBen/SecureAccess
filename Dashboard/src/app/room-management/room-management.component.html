@@ -1,60 +1,54 @@
-
-
-
 <mat-tab-group>
-        <mat-tab  label="Display Rooms"> 
-                <mat-form-field>
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-                </mat-form-field>   
-                <div class="container">    
-                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-                           <!-- Position Column -->
-                            <ng-container matColumnDef="position">
-                              <th mat-header-cell *matHeaderCellDef> No. </th>
-                              <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-                            </ng-container>
-                      
-                            <!-- Name Column -->
-                            <ng-container matColumnDef="name">
-                              <th mat-header-cell *matHeaderCellDef> Name </th>
-                              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-                            </ng-container>
+    <mat-tab  label="Display Rooms">
+        <mat-form-field>
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+        <div class="container">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                <!-- Position Column -->
+                <ng-container matColumnDef="position">
+                    <th mat-header-cell *matHeaderCellDef> No. </th>
+                    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+                </ng-container>
 
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> Name </th>
+                    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
 
-                            <ng-container matColumnDef="state">
-                              <th mat-header-cell *matHeaderCellDef> state </th>
-                              <td mat-cell *matCellDef="let element"> 
-                                    <mat-slide-toggle
-                                        class="example-margin"
-                                        checked="{{element.state}}">
-                                    </mat-slide-toggle>
-                               </td>
-                            </ng-container>
-                            
-                            <ng-container matColumnDef="del">
-                                    <th mat-header-cell *matHeaderCellDef> del </th>
-                                    <td mat-cell *matCellDef="let element"> 
-                                         <a >
-                                            <i class="material-icons">delete_forever</i>
-                                         </a>
-                                     </td>
-                            </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                    </table>
-                </div>
-        </mat-tab>
-        <mat-tab label="Add Room"> 
-            <form class="example-form">
-                <mat-form-field class="example-full-width">
-                  <input matInput placeholder="Name">
-                </mat-form-field>
-            
-                <mat-form-field class="example-full-width">
-                  <input matInput placeholder="Number">
-                </mat-form-field>
-                <button mat-stroked-button>Add</button>
-            </form>          
-        </mat-tab>
-      </mat-tab-group>
-      
+                <ng-container matColumnDef="state">
+                    <th mat-header-cell *matHeaderCellDef> state </th>
+                    <td mat-cell *matCellDef="let element">
+                        <mat-slide-toggle class="example-margin" checked="{{element.state}}"
+                                          (change)="change(element._id, element.state)">
+                        </mat-slide-toggle>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="del">
+                    <th mat-header-cell *matHeaderCellDef> delete </th>
+                    <td mat-cell *matCellDef="let element, let i = index">
+                        <a (click)="delRoom(i, element._id)">
+                            <i class="material-icons" style="cursor: pointer">delete_forever</i>
+                        </a>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </mat-tab>
+    <mat-tab label="Add Room">
+        <form class="example-form">
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Name" [(ngModel)]="addRoomInfo.name" name="name">
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Number" [(ngModel)]="addRoomInfo.position" name="position">
+            </mat-form-field>
+            <button mat-stroked-button (click)="addRoom()">Add</button>
+        </form>
+    </mat-tab>
+</mat-tab-group>

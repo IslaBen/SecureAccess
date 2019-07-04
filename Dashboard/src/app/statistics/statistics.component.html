@@ -1,0 +1,19 @@
+<div class="container">
+    <div class="row mt-5">
+
+        <div class="col-8 bg-light ml-5">
+            <p class="mb-2 text-info h5">nombre d'accées par jour</p>
+            <canvas baseChart
+                    [datasets]="barChartData"
+                    [labels]="mbarChartLabels"
+                    [options]="barChartOptions"
+                    [colors]="barChartColors"
+                    [legend]="barChartLegend"
+                    [chartType]="barChartType"
+                    (chartHover)="chartHovered($event)"
+                    (chartClick)="chartClicked($event)"></canvas>
+        </div>
+    </div>
+</div>
+
+

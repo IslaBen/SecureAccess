@@ -1,5 +1,6 @@
-export interface Room {
+export class Room {
+    _id : string;
     name: string;
-    position: number;
+    position: string;
     state : boolean;
 }

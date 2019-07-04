@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 var RoomSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name : String,
-    position : Number,
+    position : String,
     state : Boolean,
 })
 

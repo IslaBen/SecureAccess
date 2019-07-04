@@ -1,1 +1,8 @@
-<mat-toolbar class="nav"><h1>SecureAccess</h1></mat-toolbar>
+<mat-toolbar class="nav">
+    <h1>SecureAccess</h1>
+    <form class="form-inline">
+        <input  *ngIf="!auth.logedIn()" class="form-control mr-sm-2 btn btn-outline-success" routerLink="/Login" type="button" value="log in">
+        <input  *ngIf="!auth.logedIn()" class="form-control mr-sm-2 btn btn-outline-info" routerLink="/Signin" type="button" value="sign in">
+        <input  *ngIf="auth.logedIn()" class="form-control mr-sm-2 btn btn-outline-info px-3" (click)="auth.logoutUser()" type="button" value="log out">
+    </form>
+</mat-toolbar>
