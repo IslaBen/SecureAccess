@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import {User} from '../User';
 import {Room} from '../Room';
-import {accessLog} from '../accessLog';
+import {AccessLog} from '../accessLog';
 import {ServService} from '../serv.service';
 
 export interface PeriodicElement {
@@ -32,7 +32,7 @@ export interface PeriodicElement {
 export class AccesslogComponent implements OnInit {
 
 
-    private logs : accessLog[];
+    private logs: AccessLog[];
     private rooms: Room[];
     private dataSource;
 
@@ -42,7 +42,7 @@ export class AccesslogComponent implements OnInit {
         this.getAllLogs();
     }
 
-    displayedColumns: string[] = ['name', 'room', 'time', 'del'];
+    displayedColumns: string[] = ['name', 'room', 'timeIn','timeOut', 'del'];
 
     applyFilter(filterValue: string) {
         this.dataSource.filter = filterValue.trim().toLowerCase();

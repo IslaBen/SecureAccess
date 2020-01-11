@@ -1,37 +1,42 @@
 <mat-form-field>
     <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
 </mat-form-field>
-  <div class="container">   
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-  
+<div class="container">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef> Name </th>
-          <td mat-cell *matCellDef="let element"> {{element.person}} </td>
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.person}} </td>
         </ng-container>
-  
-  
+
+
         <ng-container matColumnDef="room">
-          <th mat-header-cell *matHeaderCellDef> Room </th>
-          <td mat-cell *matCellDef="let element"> {{element.door}} </td>
-        </ng-container>
-  
-  
-        <ng-container matColumnDef="time">
-          <th mat-header-cell *matHeaderCellDef> Time </th>
-          <td mat-cell *matCellDef="let element"> {{element.createdAt| date:'medium'}} </td>
+            <th mat-header-cell *matHeaderCellDef> Room </th>
+            <td mat-cell *matCellDef="let element"> {{element.door}} </td>
         </ng-container>
 
 
-          <ng-container matColumnDef="del">
-              <th mat-header-cell *matHeaderCellDef> delete </th>
-              <td mat-cell *matCellDef="let element, let i = index">
-                  <a (click)="delRoom(i, element._id)">
-                      <i class="material-icons" style="cursor: pointer">delete_forever</i>
-                  </a>
-              </td>
-          </ng-container>
-        
+        <ng-container matColumnDef="timeIn">
+            <th mat-header-cell *matHeaderCellDef> TimeIn </th>
+            <td mat-cell *matCellDef="let element"> {{element.timeIN| date:'medium'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="timeOut">
+            <th mat-header-cell *matHeaderCellDef> TimeOut </th>
+            <td mat-cell *matCellDef="let element"> {{element.timeOUT| date:'medium'}} </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="del">
+            <th mat-header-cell *matHeaderCellDef> delete </th>
+            <td mat-cell *matCellDef="let element, let i = index">
+                <a (click)="delRoom(i, element._id)">
+                    <i class="material-icons" style="cursor: pointer">delete_forever</i>
+                </a>
+            </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-  </div>
+    </table>
+</div>

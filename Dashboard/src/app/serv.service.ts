@@ -3,7 +3,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Room} from './Room';
 import {User} from './User';
-import {accessLog} from './accessLog';
+import {AccessLog} from './accessLog';
 
 @Injectable({
     providedIn: 'root'
@@ -40,8 +40,8 @@ export class ServService {
         return this.http.patch<any>(`http://localhost:3000/rooms/${id}`, {state : !state});
     }
 
-    getLogs() :Observable<accessLog[]> {
-        return this.http.get<accessLog[]>('http://localhost:3000/logs');
+    getLogs() :Observable<AccessLog[]> {
+        return this.http.get<AccessLog[]>('http://localhost:3000/logs');
     }
 
     getPerson(id) : Observable<User> {

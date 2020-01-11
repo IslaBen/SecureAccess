@@ -1,6 +1,7 @@
-export class accessLog{
+export class AccessLog {
     _id : string;
     person : string;
     door : string
-    createdAt : Date
+    timeIN : Date
+    timeOUT : Date
 }
